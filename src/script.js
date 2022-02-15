@@ -8,7 +8,7 @@ import * as dat from 'dat.gui'
  * Base
  */
 // Debug
-const gui = new dat.GUI()
+// const gui = new dat.GUI()
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -24,6 +24,21 @@ const scene = new THREE.Scene()
  */
 const textureLoader = new THREE.TextureLoader()
 const matcapTexture = textureLoader.load('./textures/matcaps/8.png')
+
+const randomAroundText = (xRange, yRange, zRange) => {
+    
+    while (true) {
+        let x = (Math.random() - .5) * 10;
+        let y = (Math.random() - .5) * 10;
+        let z = (Math.random() - .5) * 10;
+        
+        if (
+            !((x > xRange.lower && x < xRange.upper) &&
+            (y > yRange.lower && y < yRange.upper) &&
+            (z > zRange.lower && z < zRange.upper))
+        ) return { x, y, z};
+    }
+}
 
 /**
  * Fonts
@@ -67,15 +82,22 @@ fontLoader.load(
 
         console.time('donuts')
         const donutGeometry = new THREE.TorusBufferGeometry(.3, .2, 20, 45);
+        // const knotGeometry = new THREE.TorusKnotBufferGeometry(.3, .1, 40, 45);
+        const coneGeometry = new THREE.ConeBufferGeometry(.3, .5, 25, 25);
+        const BoxGeometry = new THREE.BoxBufferGeometry(.4, .4, .4);
+        const cylinderGeometry = new THREE.CylinderBufferGeometry(.3, .3, .5, 25)
+
+        const geometries = [donutGeometry, BoxGeometry, coneGeometry, cylinderGeometry];
         
         // const donutMaterial = new THREE.MeshMatcapMaterial()
 
         for (let i = 0; i < 300; i++) {
-            const donut = new THREE.Mesh(donutGeometry, material)
+            const donut = new THREE.Mesh(geometries[Math.floor(Math.random()*geometries.length)], material)
 
-            donut.position.x = (Math.random() - .5) * 10
-            donut.position.y = (Math.random() - .5) * 10
-            donut.position.z = (Math.random() - .5) * 10
+            const donutPosition = randomAroundText( {lower: -3.5, upper: 3.5 }, {lower: -1, upper: 1.5 }, {lower: -1, upper: 3} );
+            donut.position.x = donutPosition.x // (Math.random() - .5) * 10
+            donut.position.y = donutPosition.y // (Math.random() - .5) * 10
+            donut.position.z = donutPosition.z // (Math.random() - .5) * 10
 
             donut.rotation.x = Math.random() * Math.PI
             donut.rotation.y = Math.random() * Math.PI
@@ -137,9 +159,9 @@ window.addEventListener('resize', () =>
  */
 // Base camera
 const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.x = 1
-camera.position.y = 1
-camera.position.z = 2
+camera.position.x = .5
+camera.position.y = .5
+camera.position.z = 3.14159
 scene.add(camera)
 
 // Controls
